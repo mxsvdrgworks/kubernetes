@@ -1,0 +1,6 @@
+#Default values
+
+container:
+  image: bitnami/wordpress:latest
+
+replicaCount: 3 #Number of PODS

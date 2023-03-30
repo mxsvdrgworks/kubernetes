@@ -1,0 +1,11 @@
+apiVersion   : v2
+name         : Optiblog-HelmChart
+description  : Optiblog deployed by Helm
+type         : application
+version      : 1.0
+appVersion   : "1.1"
+
+keywords:
+  - wordpress
+  - mysql
+  - apache
