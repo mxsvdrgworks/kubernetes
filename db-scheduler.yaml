@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: my-custom-scheduler
+  name: db-custom-scheduler
   naemspace: kube-system
 spec:
   containers:
