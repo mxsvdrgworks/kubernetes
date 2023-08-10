@@ -1,0 +1,30 @@
+/interface/wireguard/add name=mullvad
+/interface/wireguard/print detail
+/interface/wireguard/print detail
+/interface/wireguard/set mullvad private-key="IJC0Nbmp2ZsidJ9Qx33MszvbAIbbuY/BjeFrEDsgMmI="
+/interface/wireguard/print detail
+/interface/wireguard/peers/add interface=mullvad public-key="MOk2OTDEaFFN4vsCAgf+qQi6IlY99nCeDEzpXyo65wg=" \
+    endpoint-address=138.199.15.162 endpoint-port=51820 allowed-address=0.0.0.0/0,::/0
+
+/ip/address/add interface=mullvad address=10.64.229.157/32 network=10.124.1.24
+/ipv6/address/add interface=mullvad address=fc00:bbbb:bbbb:bb01::4:9696/64
+/routing/table/add name=mullvad fib
+/ip/route/add gateway=10.124.1.24 dst-address=0.0.0.0/0 routing-table=mullvad
+/ipv6/route/add gateway=fc00:bbbb:bbbb:bb01::1%mullvad dst-address=::/0 routing-table=mullvad
+/routing/rule/add action=lookup-only-in-table table=mullvad routing-mark=mullvad
+
+/ip/firewall/nat/add action=masquerade out-interface=mullvad chain=srcnat
+/ip/firewall/filter/add action=drop chain=input in-interface=mullvad
+/ip/firewall/filter/add action=drop chain=forward in-interface=mullvad connection-state=new connection-nat-state=!dstnat
+
+/ipv6/firewall/nat/add action=masquerade chain=srcnat out-interface=mullvad
+/ipv6/firewall/filter/add action=drop chain=input in-interface=mullvad
+/ipv6/firewall/filter/add action=drop chain=forward in-interface=mullvad connection-state=new
+
+/ip/firewall/mangle/add chain=prerouting in-interface=ether2 action=mark-routing \
+    new-routing-mark=mullvad connection-nat-state=!dstnat passthrough=no
+/ipv6/firewall/mangle/add chain=prerouting in-interface=ether2 action=mark-routing \
+    new-routing-mark=mullvad passthrough=no
+
+/ip/dns/set servers=100.64.0.7 allow-remote-requests=yes use-doh-server=""
+/ip/firewall/mangle/add chain=output dst-address=100.64.0.7 action=mark-routing new-routing-mark=mullvad passthrough=no
